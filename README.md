@@ -40,9 +40,7 @@ El archivo Excel debe contener las siguientes columnas:
 
 Puedes probar la aplicación directamente desde Streamlit Cloud:
 
-[👉 Ir a la app](https://TU-ENLACE.streamlit.app)
-
-> Reemplaza "TU-ENLACE" con el nombre que elegiste al desplegar.
+[👉 Ir a la app](https://presupuesto-inteligente.streamlit.app)
 
 ## 🧑‍💻 Autor
 
