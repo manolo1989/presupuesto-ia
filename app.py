@@ -2,27 +2,39 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import io
 
-# Cargar modelo
-modelo = joblib.load("modelo_costos_entrenado.pkl")
+st.set_page_config(page_title="Estimador de Costo Real", layout="centered")
 
 st.title("Sistema Inteligente para Estimar Costo Real de Presupuestos de Obra")
+st.markdown("Sube tu archivo Excel con partidas")
 
-archivo = st.file_uploader("Sube tu archivo Excel con partidas", type=["xlsx"])
+uploaded_file = st.file_uploader("Drag and drop file here", type=["xlsx"])
 
-if archivo:
-    df = pd.read_excel(archivo)
+if uploaded_file:
+    df_pred = pd.read_excel(uploaded_file)
 
     st.subheader("Vista previa del presupuesto cargado")
-    st.dataframe(df.head())
+    st.dataframe(df_pred)
 
-    if all(col in df.columns for col in ["Cantidad", "PU (S/.)", "Duración (días)"]):
-        X = df[["Cantidad", "PU (S/.)", "Duración (días)"]]
-        df["Costo Real (S/.) (Modelo)"] = modelo.predict(X)
+    columnas_requeridas = ['Cantidad', 'PU (S/.)', 'Duración (días)', 'Ubicación']
+    modelo = joblib.load("modelo_costos_entrenado.pkl")
 
-        st.subheader("Resultados con estimación del modelo")
-        st.dataframe(df[["Item", "Partida", "Costo Real (S/.) (Modelo)"]].head())
+    df_pred["Costo Real (S/.) (Modelo)"] = modelo.predict(df_pred[columnas_requeridas])
 
-        st.download_button("Descargar resultados", data=df.to_excel(index=False), file_name="presupuesto_estimado.xlsx")
-    else:
-        st.error("Tu archivo debe tener las columnas: Cantidad, PU (S/.) y Duración (días)")
+    st.subheader("Resultados con estimación del modelo")
+    st.dataframe(df_pred[["Item", "Partida", "Costo Real (S/.) (Modelo)"]])
+
+    # Crear archivo Excel en memoria para descarga
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df_pred.to_excel(writer, index=False, sheet_name='Resultados')
+        writer.save()
+    processed_data = output.getvalue()
+
+    st.download_button(
+        label="📥 Descargar resultados",
+        data=processed_data,
+        file_name="resultados_modelo.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
