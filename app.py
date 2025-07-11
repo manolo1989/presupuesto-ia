@@ -4,7 +4,7 @@ import pandas as pd
 import joblib
 
 # Cargar el modelo entrenado
-modelo = joblib.load("modelo_costos_sin_ubicacion.pkl")
+modelo = joblib.load("modelo_entrenado_sin_ubicacion.pkl")
 
 # Título
 st.title("Estimador Inteligente de Costos Reales de Obra (sin ubicación)")
