@@ -1,32 +1,59 @@
 
 import streamlit as st
 import pandas as pd
+import joblib
 import numpy as np
-import io
+import datetime
 
-st.set_page_config(page_title="Ajuste Inteligente de Presupuesto", layout="wide")
-st.title("📊 Sistema de Ajuste de Presupuesto con Simulación IA")
+# Cargar modelo
+modelo = joblib.load("modelo_costos_entrenado.pkl")
 
-st.markdown("Sube un archivo Excel con tu presupuesto estimado para analizarlo y obtener un nuevo presupuesto ajustado automáticamente.")
+st.title("Predicción de Costo Real por Partida")
+st.write("Esta herramienta predice el costo real de cada partida de un presupuesto usando Machine Learning.")
 
-uploaded_file = st.file_uploader("Selecciona tu archivo Excel (.xlsx)", type=["xlsx"])
+# Cargar archivo Excel
+archivo = st.file_uploader("📤 Sube tu archivo de presupuesto en Excel (.xlsx)", type=["xlsx"])
 
-if uploaded_file is not None:
-    try:
-        df = pd.read_excel(uploaded_file)
-        df["Precio Unitario Estimado (S/.)"] = pd.to_numeric(df["Precio Unitario Estimado (S/.)"], errors="coerce")
-        df["Cantidad"] = pd.to_numeric(df["Cantidad"], errors="coerce")
+if archivo:
+    df = pd.read_excel(archivo)
 
-        ajuste_percent = np.random.uniform(0.05, 0.15, size=len(df))
-        df["Precio Unitario Ajustado (S/.)"] = np.round(df["Precio Unitario Estimado (S/.)"] * (1 + ajuste_percent), 2)
-        df["Costo Parcial Ajustado (S/.)"] = np.round(df["Cantidad"] * df["Precio Unitario Ajustado (S/.)"], 2)
+    # Verificamos si ya tiene Costo Real
+    tiene_costo_real = "Costo Real (S/.)" in df.columns
 
-        st.success("✅ Análisis completado. Revisa los datos abajo.")
-        st.dataframe(df, use_container_width=True)
+    # Verificamos columnas mínimas necesarias
+    columnas_requeridas = ["Cantidad", "PU (S/.)", "Duración (días)", "Ubicación"]
+    if all(col in df.columns for col in columnas_requeridas):
 
-        output = io.BytesIO()
-        df.to_excel(output, index=False)
-        st.download_button("📥 Descargar archivo ajustado", output.getvalue(), file_name="presupuesto_ajustado.xlsx")
+        # Copia del original para predicción
+        df_pred = df.copy()
 
-    except Exception as e:
-        st.error(f"Ocurrió un error al procesar el archivo: {e}")
+        # Predecimos Costo Real solo si no lo tiene
+        if not tiene_costo_real:
+            df_pred["Costo Real (S/.)"] = modelo.predict(df_pred[columnas_requeridas])
+
+        # Si ya lo tiene, igual mostramos comparación
+        else:
+            df_pred["Costo Real (S/.) (Modelo)"] = modelo.predict(df_pred[columnas_requeridas])
+            df_pred["Diferencia (%)"] = ((df_pred["Costo Real (S/.) (Modelo)"] - df_pred["Costo Real (S/.)"]) / df_pred["Costo Real (S/.)"]) * 100
+            df_pred["Estado"] = np.where(df_pred["Diferencia (%)"] > 0, "🔴 SobreCosto", "🟢 Ahorro")
+
+        # Mostrar resultado
+        st.subheader("📋 Presupuesto con Resultados")
+        st.dataframe(df_pred)
+
+        # Mostrar total estimado
+        if not tiene_costo_real:
+            total_estimado = df_pred["Costo Real (S/.)"].sum()
+        else:
+            total_estimado = df_pred["Costo Real (S/.) (Modelo)"].sum()
+        st.success(f"💰 Costo Total Estimado del Proyecto: S/ {total_estimado:,.2f}")
+
+        # Descargar archivo
+        st.subheader("⬇ Descargar archivo con resultados")
+        nombre_salida = f"presupuesto_con_resultados_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        df_pred.to_excel(nombre_salida, index=False)
+        with open(nombre_salida, "rb") as f:
+            st.download_button("📥 Descargar Excel", f, file_name=nombre_salida)
+
+    else:
+        st.warning("Tu archivo debe tener las columnas: 'Cantidad', 'PU (S/.)', 'Duración (días)', 'Ubicación'")
