@@ -1,51 +1,48 @@
+# 🏗️ Aplicación de Predicción de Costos Reales - Presupuesto Inteligente
 
-# 📊 Sistema Inteligente de Ajuste de Presupuestos de Obra
+Esta aplicación permite predecir el **Costo Real por partida** de un proyecto de construcción usando **Machine Learning (Regresión Lineal)** entrenado con presupuestos históricos simulados.
 
-Este sistema permite subir un archivo Excel con un presupuesto estimado de construcción y, mediante una simulación de inteligencia artificial, ajusta automáticamente los precios unitarios. Está pensado para ayudar a las constructoras a prever desviaciones en costos antes de ejecutar una obra.
-
-## 🚀 Funcionalidades
-
-- Subida de archivos Excel (.xlsx) con presupuestos.
-- Análisis automático de precios unitarios.
-- Generación de nuevos precios ajustados por IA (simulada con variación aleatoria entre 5% y 15%).
-- Cálculo del costo parcial ajustado por cada partida.
-- Visualización interactiva de los datos.
-- Descarga del nuevo archivo con los precios ajustados.
-
-## 🛠 Requisitos
-
-Este proyecto utiliza:
-- Python
-- Streamlit
-- Pandas
-- Numpy
-- Openpyxl
-
-Instala los requisitos con:
-
-```
-pip install -r requirements.txt
-```
-
-## 📂 Estructura de entrada esperada
-
-El archivo Excel debe contener las siguientes columnas:
-
-- `Partida`
-- `Unidad`
-- `Cantidad`
-- `Precio Unitario Estimado (S/.)`
-
-## 🌐 Ver en línea
-
-Puedes probar la aplicación directamente desde Streamlit Cloud:
-
-[👉 Ir a la app](https://presupuesto-inteligente.streamlit.app)
-
-## 🧑‍💻 Autor
-
-Desarrollado por [manolo1989](https://github.com/manolo1989) como parte de un proyecto de tesis de pregrado.
+Desarrollada en Python con **Streamlit** y **scikit-learn**, ideal para estudiantes de ingeniería, arquitectos o profesionales del sector construcción.
 
 ---
 
-¡Gracias por visitar este repositorio! Cualquier sugerencia o mejora es bienvenida.
+## 🚀 ¿Qué hace la app?
+
+- 📤 Permite subir un archivo Excel con tu presupuesto (cantidad, precio unitario, ubicación, duración)
+- 🤖 Predice automáticamente el `Costo Real (S/.)` por partida usando un modelo entrenado
+- 📊 Compara si hubo ahorro (🟢) o sobrecosto (🔴)
+- 💰 Muestra el **Costo Total Estimado del Proyecto**
+- 📥 Descarga un nuevo Excel con los resultados
+
+---
+
+## 📂 Archivos del repositorio
+
+| Archivo                      | Descripción |
+|-----------------------------|-------------|
+| `app.py`                    | Código principal de la app Streamlit |
+| `modelo_costos_entrenado.pkl` | Modelo de Machine Learning entrenado |
+| `requirements.txt`          | Paquetes necesarios para ejecutar en Streamlit Cloud |
+
+---
+
+## 📦 Requisitos
+
+- Python 3.9 o superior
+- Streamlit (se instala con `requirements.txt`)
+
+---
+
+## 📡 Publicación en Streamlit Cloud
+
+1. Crea una cuenta en https://streamlit.io/cloud
+2. Conecta tu GitHub
+3. Crea un nuevo repositorio con los 3 archivos mencionados
+4. En Streamlit Cloud, selecciona el repo y lanza la app
+
+---
+
+## 📞 Contacto
+
+Desarrollado como parte de un proyecto de tesis de pregrado en Perú.  
+**Tema:** Aplicación de Inteligencia Artificial para el diseño de un sistema inteligente de presupuestos de obra.
