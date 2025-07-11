@@ -2,35 +2,35 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import io
 
-st.set_page_config(page_title="Estimador de Costo Real", layout="centered")
+# Cargar el modelo entrenado
+modelo = joblib.load("modelo_costos_sin_ubicacion.pkl")
 
+# Título
 st.title("Estimador Inteligente de Costos Reales de Obra (sin ubicación)")
 st.markdown("Sube tu archivo Excel con las columnas: 'Cantidad', 'PU (S/.)', 'Duración (días)'")
 
-uploaded_file = st.file_uploader("Sube tu archivo .xlsx", type=["xlsx"])
+# Subida de archivo
+archivo = st.file_uploader("Sube tu archivo .xlsx", type=["xlsx"])
 
-if uploaded_file:
-    df_pred = pd.read_excel(uploaded_file)
-
+if archivo is not None:
+    df_pred = pd.read_excel(archivo)
     st.subheader("Presupuesto cargado")
     st.dataframe(df_pred)
 
-    modelo = joblib.load("modelo_entrenado_sin_ubicacion.pkl")
     columnas_requeridas = ['Cantidad', 'PU (S/.)', 'Duración (días)']
-    df_pred["Costo Real (S/.) (Modelo)"] = modelo.predict(df_pred[columnas_requeridas])
 
-    st.subheader("Resultados del modelo")
-    st.dataframe(df_pred)
+    if all(col in df_pred.columns for col in columnas_requeridas):
+        df_pred["Costo Real (S/.) (Modelo)"] = modelo.predict(df_pred[columnas_requeridas])
+        st.subheader("Resultados del modelo")
+        st.dataframe(df_pred)
 
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        df_pred.to_excel(writer, index=False, sheet_name='Resultados')
-        writer.save()
-    st.download_button(
-        label="📥 Descargar Excel con resultados",
-        data=output.getvalue(),
-        file_name="resultado_prediccion.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+        # Descargar como Excel
+        from io import BytesIO
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')
+        df_pred.to_excel(writer, index=False)
+        writer.close()
+        st.download_button("Descargar resultados", data=output.getvalue(), file_name="presupuesto_estimado.xlsx")
+    else:
+        st.warning("El archivo debe contener las columnas necesarias: 'Cantidad', 'PU (S/.)', 'Duración (días)'")
