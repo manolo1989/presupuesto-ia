@@ -1,48 +1,36 @@
-# 🏗️ Aplicación de Predicción de Costos Reales - Presupuesto Inteligente
 
-Esta aplicación permite predecir el **Costo Real por partida** de un proyecto de construcción usando **Machine Learning (Regresión Lineal)** entrenado con presupuestos históricos simulados.
+# Sistema Inteligente para Estimar Costos Reales de Presupuestos de Obra
 
-Desarrollada en Python con **Streamlit** y **scikit-learn**, ideal para estudiantes de ingeniería, arquitectos o profesionales del sector construcción.
+Este proyecto permite cargar un archivo Excel con partidas de obra y obtener una estimación del costo real usando un modelo de Machine Learning entrenado con datos simulados.
 
----
+## 🔧 Cómo usar
 
-## 🚀 ¿Qué hace la app?
+1. Clona este repositorio en tu máquina o súbelo a Streamlit Cloud.
+2. Asegúrate de tener instalado `streamlit`, `pandas`, `scikit-learn`, `joblib`, y `openpyxl`.
+3. Ejecuta la aplicación con:
 
-- 📤 Permite subir un archivo Excel con tu presupuesto (cantidad, precio unitario, ubicación, duración)
-- 🤖 Predice automáticamente el `Costo Real (S/.)` por partida usando un modelo entrenado
-- 📊 Compara si hubo ahorro (🟢) o sobrecosto (🔴)
-- 💰 Muestra el **Costo Total Estimado del Proyecto**
-- 📥 Descarga un nuevo Excel con los resultados
+```bash
+streamlit run app.py
+```
 
----
+4. Sube tu archivo Excel que contenga las columnas:
+   - `Cantidad`
+   - `PU (S/.)`
+   - `Duración (días)`
 
-## 📂 Archivos del repositorio
+El sistema mostrará una predicción del **Costo Real (S/.)** para cada partida.
 
-| Archivo                      | Descripción |
-|-----------------------------|-------------|
-| `app.py`                    | Código principal de la app Streamlit |
-| `modelo_costos_entrenado.pkl` | Modelo de Machine Learning entrenado |
-| `requirements.txt`          | Paquetes necesarios para ejecutar en Streamlit Cloud |
+## 📁 Archivos del proyecto
 
----
+- `app.py`: Código principal de la aplicación.
+- `requirements.txt`: Lista de librerías necesarias.
+- `modelo_costos_entrenado.pkl`: Modelo de regresión lineal entrenado.
+- `config.toml`: Configuración visual de la app (opcional).
 
-## 📦 Requisitos
+## 🌐 Despliegue en Streamlit Cloud
 
-- Python 3.9 o superior
-- Streamlit (se instala con `requirements.txt`)
-
----
-
-## 📡 Publicación en Streamlit Cloud
-
-1. Crea una cuenta en https://streamlit.io/cloud
-2. Conecta tu GitHub
-3. Crea un nuevo repositorio con los 3 archivos mencionados
-4. En Streamlit Cloud, selecciona el repo y lanza la app
+Puedes subir este repositorio directamente a Streamlit Cloud y publicar tu app de forma gratuita.
 
 ---
 
-## 📞 Contacto
-
-Desarrollado como parte de un proyecto de tesis de pregrado en Perú.  
-**Tema:** Aplicación de Inteligencia Artificial para el diseño de un sistema inteligente de presupuestos de obra.
+Proyecto de tesis basado en simulación de presupuestos reales con IA.
