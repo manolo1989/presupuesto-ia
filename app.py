@@ -7,7 +7,7 @@ import joblib
 modelo = joblib.load("modelo_entrenado_sin_ubicacion.pkl")
 
 # Título
-st.title("Estimador Inteligente de Costos Reales de Obra (sin ubicación)")
+st.title("🏗️Sistema de Prediccion de Presupuestos de Obra con IA")
 st.markdown("Sube tu archivo Excel con las columnas: 'Cantidad', 'PU (S/.)', 'Duración (días)'")
 
 # Subida de archivo
