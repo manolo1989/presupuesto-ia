@@ -84,15 +84,15 @@ if uploaded_file is not None:
         simbolo = "🔺" if diferencia > 0 else "🔻" if diferencia < 0 else "➖"
         col3.metric("Diferencia entre presupuestos", f"{porcentaje:.2f}% {simbolo}")
 
-         # Top 5 partidas con mayor diferencia (positiva o negativa)
-    st.markdown("### 🔍 Top 5 partidas con mayor diferencia")
-df["Diferencia"] = df["Costo Estimado IA"] - df["Costo Parcial"]
-df["Diferencia Abs"] = df["Diferencia"].abs()
-top_diff = df.sort_values("Diferencia Abs", ascending=False).head(5)
-st.dataframe(top_diff[["Item", "Partida", "Unidad", "Cantidad", "PU (S/.)", "Costo Parcial", "Costo Estimado IA"]].style.set_properties(**{
-    'background-color': '#ffdddd',
-    'color': 'black'
-}), height=250)
+  # Top 5 partidas con mayor diferencia (positiva o negativa)
+	st.markdown("### 🔍 Top 5 partidas con mayor diferencia")
+	df["Diferencia"] = df["Costo Estimado IA"] - df["Costo Parcial"]
+	df["Diferencia Abs"] = df["Diferencia"].abs()
+	top_diff = df.sort_values("Diferencia Abs", ascending=False).head(5)
+	st.dataframe(top_diff[["Item", "Partida", "Unidad", "Cantidad", "PU (S/.)", "Costo Parcial", "Costo Estimado 	IA"]].style.set_properties(**{
+    	'background-color': '#ffdddd',
+    	'color': 'black'
+	}), height=250)
 
         # Botón funcional para descargar el análisis completo
         output = BytesIO()
