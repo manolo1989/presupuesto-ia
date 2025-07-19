@@ -24,6 +24,7 @@ with col2:
             href = f'<a href="data:application/octet-stream;base64,{b64}" download="plantilla_presupuesto_modelo.xlsx"><button style="background-color:#28a745;color:white;padding:6px 12px;border:none;border-radius:5px;font-size:13px">📥 Descargar plantilla de ejemplo</button></a>'
             st.markdown(href, unsafe_allow_html=True)
 
+
 # Subida de archivo
 st.markdown("### 📤 Subir archivo Excel con tu presupuesto")
 uploaded_file = st.file_uploader("Arrastra tu archivo aquí o haz clic para seleccionarlo", type=["xlsx"], label_visibility="collapsed")
