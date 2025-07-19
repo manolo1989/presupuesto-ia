@@ -69,18 +69,22 @@ if archivo is not None:
 
         # Mostrar presupuesto analizado
         st.markdown("### 🤖 Presupuesto analizado por IA")
+        df["resaltado"] = df["Costo Estimado IA"] - df["Costo Parcial"]
         df_show = df.copy()
         df_show["Costo Parcial"] = df_show["Costo Parcial"].apply(lambda x: f"S/ {x:,.2f}")
         df_show["Costo Estimado IA"] = df_show["Costo Estimado IA"].apply(lambda x: f"S/ {x:,.2f}")
-        df_show["resaltado"] = df["Costo Estimado IA"] - df["Costo Parcial"]
 
         def color_fila(row):
-            if row["resaltado"] > 100:
-                return ['background-color: #ffcccc'] * len(row)
-            elif row["resaltado"] < -100:
-                return ['background-color: #fff3cd'] * len(row)
-            else:
-                return ['background-color: #d4edda'] * len(row)
+            try:
+                diff = float(row["Costo Estimado IA"].replace("S/ ", "").replace(",", "")) - float(row["Costo Parcial"].replace("S/ ", "").replace(",", ""))
+                if diff > 100:
+                    return ['background-color: #ffcccc'] * len(row)
+                elif diff < -100:
+                    return ['background-color: #fff3cd'] * len(row)
+                else:
+                    return ['background-color: #d4edda'] * len(row)
+            except:
+                return [''] * len(row)
 
         st.dataframe(df_show.drop(columns=["resaltado"]).style.apply(color_fila, axis=1), height=250)
         costo_estimado_total = df["Costo Estimado IA"].sum()
@@ -102,7 +106,7 @@ if archivo is not None:
         st.dataframe(top_diff[["Item", "Partida", "Unidad", "Cantidad", "PU (S/.)", "Costo Parcial", "Costo Estimado IA"]].style.set_properties(**{'background-color': '#ffdddd'}), height=250)
 
         output = BytesIO()
-        df.drop(columns=["Diferencia"], errors='ignore').to_excel(output, index=False, engine='xlsxwriter')
+        df.drop(columns=["Diferencia", "resaltado"], errors='ignore').to_excel(output, index=False, engine='xlsxwriter')
         st.download_button("📥 Descargar presupuesto con análisis", data=output.getvalue(), file_name="presupuesto_estimado.xlsx", mime="application/vnd.ms-excel")
 
     else:
