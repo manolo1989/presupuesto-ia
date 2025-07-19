@@ -1,4 +1,5 @@
 
+
 import streamlit as st
 import pandas as pd
 import joblib
@@ -115,3 +116,4 @@ if uploaded_file is not None:
 
     else:
         st.error("❗ El archivo debe tener las columnas: 'Cantidad', 'PU (S/.)', y 'Duración (días)'")
+
