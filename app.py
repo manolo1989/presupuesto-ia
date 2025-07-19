@@ -84,11 +84,11 @@ if uploaded_file is not None:
         simbolo = "🔺" if diferencia > 0 else "🔻" if diferencia < 0 else "➖"
         col3.metric("Diferencia entre presupuestos", f"{porcentaje:.2f}% {simbolo}")
 
-        # Top 5
+         # Top 5
         st.markdown("### 🔍 Top 5 partidas con mayor diferencia")
         df["Diferencia"] = df["Costo Estimado IA"] - df["Costo Parcial"]
         top_diff = df.sort_values("Diferencia", ascending=False).head(5)
-        st.dataframe(top_diff[["Item", "Partida", "Unidad", "Cantidad", "PU (S/.)", "Costo Parcial", "Costo Estimado IA"]].style.set_properties(**{
+        st.dataframe(top_diff[["Item", "Partida", "Unidad", "Cantidad"]].style.set_properties(**{
             'background-color': '#ffdddd',
             'color': 'black'
         }), height=250)
