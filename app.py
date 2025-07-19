@@ -101,10 +101,12 @@ if uploaded_file is not None:
             'color': 'black'
         }), height=250)
 
-        # Exportar
-        output = BytesIO()
-        df.drop(columns=["Diferencia", "resaltado"], errors='ignore').to_excel(output, index=False, engine='xlsxwriter')
-        st.download_button("📥 Descargar presupuesto con análisis", data=output.getvalue(), file_name="presupuesto_estimado.xlsx", mime="application/vnd.ms-excel")
+         # Botón rojo grande centrado
+        st.markdown("<div style='text-align: center; margin-top: 20px;'>"
+                    "<button style='background-color: red; color: white; padding: 12px 24px; font-size: 18px; border: none; border-radius: 8px;'>"
+                    "📥 Descargar presupuesto con análisis</button></div>", unsafe_allow_html=True)
+
+
 
         # Descripción del sistema
         st.markdown("### ℹ️ ¿Cómo funciona este sistema?")
