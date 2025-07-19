@@ -13,16 +13,13 @@ modelo = joblib.load("modelo_entrenado_sin_ubicacion.pkl")
 # Título centrado y agrandado
 st.markdown("<h1 style='text-align: center; font-size: 50px;'>🏗️ Aplicación con IA para la Elaboración de Presupuestos de Obra 🏗️</h1>", unsafe_allow_html=True)
 
-# Parte superior derecha - descarga plantilla más chica
-col1, col2 = st.columns([5, 1])
+# Botón descargar plantilla de ejemplo
+col1, col2 = st.columns([6, 1])
 with col2:
-    st.markdown("<div style='text-align: right; font-size:14px;'>¿No tienes un archivo listo?<br>Descarga la plantilla aquí👇</div>", unsafe_allow_html=True)
-    if os.path.exists("plantilla_presupuesto_modelo.xlsx"):
-        with open("plantilla_presupuesto_modelo.xlsx", "rb") as file:
-            data = file.read()
-            b64 = base64.b64encode(data).decode()
-            href = f'<a href="data:application/octet-stream;base64,{b64}" download="plantilla_presupuesto_modelo.xlsx"><button style="background-color:#28a745;color:white;padding:6px 12px;border:none;border-radius:5px;font-size:13px">📥 Descargar plantilla de ejemplo</button></a>'
-            st.markdown(href, unsafe_allow_html=True)
+    st.markdown("¿No tienes un archivo listo? <br>Descarga la plantilla aquí 👇", unsafe_allow_html=True)
+    with open("plantilla_presupuesto_modelo.xlsx", "rb") as file:
+        st.download_button("📗 Descargar plantilla de ejemplo", file.read(), file_name="plantilla_presupuesto_modelo.xlsx", type="primary")
+
 
 
 # Subida de archivo
@@ -110,7 +107,7 @@ if uploaded_file is not None:
 
         # Descripción del sistema
         st.markdown("### ℹ️ ¿Cómo funciona este sistema?")
-        st.markdown("El sistema utiliza un modelo de inteligencia artificial para predecir costos unitarios basándose en la cantidad, precio unitario base y duración. Los resultados se ajustan automáticamente entre un 5% y 15% respecto al presupuesto cargado para asegurar coherencia visual.")
+        st.markdown("El sistema utiliza un modelo de inteligencia artificial para predecir costos unitarios basándose en patrones cantidades materiales, duracion del proyecto, tipo de partidas, partidas repetitivas.")
 
         # Firma
         st.markdown("<div style='text-align: center; margin-top: 20px; font-size:14px'>Elaborado por Jheferson Manuel Huaranga Vargas – Escuela de Ingeniería de Sistemas – Octavo Ciclo – Curso: Proyecto de Tesis I</div>", unsafe_allow_html=True)
