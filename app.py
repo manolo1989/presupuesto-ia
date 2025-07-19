@@ -4,43 +4,43 @@ import pandas as pd
 import joblib
 from io import BytesIO
 import os
+import base64
 
-# Configurar página
+# Configuración de la página
 st.set_page_config(page_title="Estimador de Costos de Obra", layout="wide")
 
 # Cargar modelo entrenado
 modelo = joblib.load("modelo_entrenado_sin_ubicacion.pkl")
 
-# Encabezado
+# Encabezado principal
 st.title("📐 Estimador Inteligente de Costos Reales de Obra")
 
-# Descargar plantilla con estilo llamativo
+# Botón personalizado para descargar plantilla
 st.markdown("### 🧾 ¿No tienes un archivo listo?")
 st.markdown("Haz clic aquí para descargar una plantilla de ejemplo 👇", unsafe_allow_html=True)
+
 if os.path.exists("plantilla_presupuesto_modelo.xlsx"):
     with open("plantilla_presupuesto_modelo.xlsx", "rb") as file:
-        st.download_button(
-            "🟢 Descargar plantilla de ejemplo",
-            data=file,
-            file_name="plantilla_presupuesto_modelo.xlsx",
-            mime="application/vnd.ms-excel"
-        )
+        data = file.read()
+        b64 = base64.b64encode(data).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="plantilla_presupuesto_modelo.xlsx"><button style="background-color:#28a745;color:white;padding:10px 20px;border:none;border-radius:5px;font-size:16px">📥 Descargar plantilla de ejemplo</button></a>'
+        st.markdown(href, unsafe_allow_html=True)
 
 # Subir archivo
 archivo = st.file_uploader("📤 Subir archivo Excel con tu presupuesto", type=["xlsx"])
 
 if archivo is not None:
     df = pd.read_excel(archivo)
-    st.markdown("### 🗂️ Presupuesto subido", unsafe_allow_html=True)
-    st.dataframe(df.style.set_properties(**{'background-color': '#1f1f1f', 'color': 'white'}), use_container_width=True)
+    st.markdown("### 📁 Presupuesto subido")
+    st.dataframe(df)
 
     columnas_requeridas = ['Cantidad', 'PU (S/.)', 'Duración']
     columnas_costo_existente = [col for col in df.columns if col.lower() in ['costo parcial', 'costo real']]
 
     if all(col in df.columns for col in columnas_requeridas):
         df["Costo Estimado IA"] = modelo.predict(df[columnas_requeridas])
-        st.markdown("### 🧠 Presupuesto analizado por IA", unsafe_allow_html=True)
-        st.dataframe(df.style.set_properties(**{'background-color': '#fff3cd', 'color': 'black'}), use_container_width=True)
+        st.markdown("### 🤖 Presupuesto analizado por IA")
+        st.dataframe(df)
 
         costo_estimado_total = df["Costo Estimado IA"].sum()
         st.markdown(f"#### 💰 Total estimado por IA: **S/ {costo_estimado_total:,.2f}**")
@@ -58,7 +58,6 @@ if archivo is not None:
             col2.metric("Costo Estimado IA", f"S/ {costo_estimado_total:,.2f}")
             col3.metric("Diferencia (%)", f"{porcentaje:.2f}% {simbolo}")
 
-        # Descargar resultados
         output = BytesIO()
         df.to_excel(output, index=False, engine='xlsxwriter')
         st.download_button("📥 Descargar presupuesto con análisis", data=output.getvalue(), file_name="presupuesto_estimado.xlsx", mime="application/vnd.ms-excel")
