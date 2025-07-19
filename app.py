@@ -3,13 +3,12 @@ import pandas as pd
 import numpy as np
 import joblib
 
-# Configuración de la página
 st.set_page_config(layout="wide")
 
-# Título principal
+# Título principal actualizado
 st.markdown("<h1 style='text-align: center; font-size: 60px;'>🏗️ Prototipo con IA para la Elaboración de Presupuestos de Obra de Construcción 🏗️</h1>", unsafe_allow_html=True)
 
-# Texto y botón de plantilla
+# Botón descargar plantilla de ejemplo
 col1, col2 = st.columns([6, 1])
 with col2:
     st.markdown("¿No tienes un archivo listo? <br>Descarga la plantilla aquí 👇", unsafe_allow_html=True)
@@ -19,6 +18,7 @@ with col2:
 # Subida de archivo
 st.markdown("### 📤 Subir archivo Excel con tu presupuesto")
 uploaded_file = st.file_uploader("Arrastra tu archivo aquí o haz clic en 'Buscar archivos'", type=["xlsx"])
+
 if uploaded_file:
     df = pd.read_excel(uploaded_file)
     columnas_requeridas = ["Item", "Nombre del Proyecto", "Ubicación", "Duración (días)", "Fecha de Inicio",
@@ -29,21 +29,16 @@ if uploaded_file:
 
         df["Costo Estimado IA"] = modelo.predict(df[["Cantidad", "PU (S/.)", "Duración (días)"]])
         df["Costo Estimado IA"] = df["Costo Estimado IA"].apply(lambda x: round(x, 2))
-        df["Simb. Costo Parcial"] = "S/ " + df["Costo Parcial"].astype(str)
-        df["Simb. Costo Estimado"] = "S/ " + df["Costo Estimado IA"].astype(str)
 
-        # Estilizado
-        def estilizar(df):
-            def color_fila(row):
-                if row["Costo Estimado IA"] > row["Costo Parcial"] * 1.1:
-                    return ["background-color: #ffcccc"] * len(row)
-                elif row["Costo Estimado IA"] < row["Costo Parcial"] * 0.9:
-                    return ["background-color: #fff2cc"] * len(row)
-                else:
-                    return [""] * len(row)
-            return df.style.apply(color_fila, axis=1)
+        # Estilizado de la tabla IA antes del renombramiento
+        def color_fila(row):
+            if row["Costo Estimado IA"] > row["Costo Parcial"] * 1.1:
+                return ["background-color: #ffcccc"] * len(row)
+            elif row["Costo Estimado IA"] < row["Costo Parcial"] * 0.9:
+                return ["background-color: #fff2cc"] * len(row)
+            else:
+                return [""] * len(row)
 
-        # Presupuesto Subido
         st.markdown("### 📁 Presupuesto subido")
         st.dataframe(df[columnas_requeridas].style.set_properties(**{
             'background-color': 'white', 'color': 'black'
@@ -51,11 +46,9 @@ if uploaded_file:
 
         st.markdown(f"<p style='text-align: right; font-weight: bold;'>💰 Total presupuesto subido: S/ {round(df['Costo Parcial'].sum(),2):,.2f}</p>", unsafe_allow_html=True)
 
-        # Presupuesto Analizado
         st.markdown("### 🤖 Presupuesto analizado por IA")
-        st.dataframe(estilizar(df[["Item", "Nombre del Proyecto", "Ubicación", "Duración (días)", "Fecha de Inicio",
-                                   "Partida", "Unidad", "Cantidad", "PU (S/.)", "Costo Parcial", "Costo Estimado IA"]]
-                              .rename(columns={"Costo Estimado IA": "S/ Costo Estimado IA"})), height=250)
+        st.dataframe(df[columnas_requeridas + ["Costo Estimado IA"]].style.apply(color_fila, axis=1), height=250)
+
         st.markdown(f"<p style='text-align: right; font-weight: bold;'>💰 Total estimado por IA: S/ {round(df['Costo Estimado IA'].sum(),2):,.2f}</p>", unsafe_allow_html=True)
 
         # Comparativo
@@ -75,7 +68,7 @@ if uploaded_file:
                          'background-color': '#ffcccc', 'color': 'black'
                      }), height=220)
 
-        # Botón rojo grande
+        # Botón rojo grande centrado
         st.markdown("<div style='text-align: center; margin-top: 20px;'>"
                     "<button style='background-color: red; color: white; padding: 12px 24px; font-size: 18px; border: none; border-radius: 8px;'>"
                     "📥 Descargar presupuesto con análisis</button></div>", unsafe_allow_html=True)
@@ -93,3 +86,4 @@ if uploaded_file:
                     "</p>", unsafe_allow_html=True)
     else:
         st.warning("El archivo cargado no tiene todas las columnas requeridas.")
+
