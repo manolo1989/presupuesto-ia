@@ -10,19 +10,14 @@ st.set_page_config(page_title="Presupuestos IA", layout="wide")
 
 modelo = joblib.load("modelo_entrenado_sin_ubicacion.pkl")
 
-# Título centrado y agrandado
 st.markdown("<h1 style='text-align: center; font-size: 50px;'>🏗️ Aplicación con IA para la Elaboración de Presupuestos de Obra 🏗️</h1>", unsafe_allow_html=True)
 
-# Botón descargar plantilla de ejemplo
 col1, col2 = st.columns([6, 1])
 with col2:
     st.markdown("¿No tienes un archivo listo? <br>Descarga la plantilla aquí 👇", unsafe_allow_html=True)
     with open("plantilla_presupuesto_modelo.xlsx", "rb") as file:
         st.download_button("📗 Descargar plantilla de ejemplo", file.read(), file_name="plantilla_presupuesto_modelo.xlsx", type="primary")
 
-
-
-# Subida de archivo
 st.markdown("### 📤 Subir archivo Excel con tu presupuesto")
 uploaded_file = st.file_uploader("Arrastra tu archivo aquí o haz clic para seleccionarlo", type=["xlsx"], label_visibility="collapsed")
 
@@ -46,9 +41,9 @@ if uploaded_file is not None:
             pred = pred * factor
         df["Costo Estimado IA"] = pred.round(2)
 
-        # Mostrar presupuesto subido
+        # Mostrar presupuesto subido sin columna "Costo Estimado IA"
         st.markdown("### 📁 Presupuesto subido")
-        df_copy = df.copy()
+        df_copy = df.drop(columns=["Costo Estimado IA"]).copy()
         df_copy["Costo Parcial"] = df_copy["Costo Parcial"].apply(lambda x: f"S/ {x:,.2f}")
         st.dataframe(df_copy.style.set_properties(**{
             'background-color': '#ffffff',
@@ -98,16 +93,14 @@ if uploaded_file is not None:
             'color': 'black'
         }), height=250)
 
-         # Botón rojo grande centrado
-        st.markdown("<div style='text-align: center; margin-top: 20px;'>"
-                    "<button style='background-color: red; color: white; padding: 12px 24px; font-size: 18px; border: none; border-radius: 8px;'>"
-                    "📥 Descargar presupuesto con análisis</button></div>", unsafe_allow_html=True)
-
-
+        # Botón funcional para descargar el análisis completo
+        output = BytesIO()
+        df.to_excel(output, index=False)
+        st.download_button("📥 Descargar presupuesto con análisis", data=output.getvalue(), file_name="presupuesto_analizado.xlsx")
 
         # Descripción del sistema
         st.markdown("### ℹ️ ¿Cómo funciona este sistema?")
-        st.markdown("El sistema utiliza un modelo de inteligencia artificial para predecir costos unitarios basándose en patrones cantidades materiales, duracion del proyecto, tipo de partidas, partidas repetitivas.")
+        st.markdown("El sistema utiliza un modelo de inteligencia artificial para predecir costos unitarios basándose en patrones cantidades materiales, duración del proyecto, tipo de partidas, partidas repetitivas.")
 
         # Firma
         st.markdown("<div style='text-align: center; margin-top: 20px; font-size:14px'>Elaborado por Jheferson Manuel Huaranga Vargas – Escuela de Ingeniería de Sistemas – Octavo Ciclo – Curso: Proyecto de Tesis I</div>", unsafe_allow_html=True)
