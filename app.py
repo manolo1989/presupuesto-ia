@@ -6,16 +6,13 @@ from io import BytesIO
 import os
 import base64
 
-# Configuración de la página
 st.set_page_config(page_title="Estimador de Costos de Obra", layout="wide")
 
-# Cargar modelo entrenado
 modelo = joblib.load("modelo_entrenado_sin_ubicacion.pkl")
 
-# Encabezado principal
 st.title("📐 Estimador Inteligente de Costos Reales de Obra")
 
-# Botón personalizado para descargar plantilla
+# Botón de descarga de plantilla con estilo verde llamativo
 st.markdown("### 🧾 ¿No tienes un archivo listo?")
 st.markdown("Haz clic aquí para descargar una plantilla de ejemplo 👇", unsafe_allow_html=True)
 
@@ -26,7 +23,6 @@ if os.path.exists("plantilla_presupuesto_modelo.xlsx"):
         href = f'<a href="data:application/octet-stream;base64,{b64}" download="plantilla_presupuesto_modelo.xlsx"><button style="background-color:#28a745;color:white;padding:10px 20px;border:none;border-radius:5px;font-size:16px">📥 Descargar plantilla de ejemplo</button></a>'
         st.markdown(href, unsafe_allow_html=True)
 
-# Subir archivo
 archivo = st.file_uploader("📤 Subir archivo Excel con tu presupuesto", type=["xlsx"])
 
 if archivo is not None:
@@ -34,11 +30,21 @@ if archivo is not None:
     st.markdown("### 📁 Presupuesto subido")
     st.dataframe(df)
 
-    columnas_requeridas = ['Cantidad', 'PU (S/.)', 'Duración']
+    columnas_requeridas_modelo = ['Cantidad', 'PU (S/.)', 'Duración (días)']
+    columnas_flexibles = {
+        'Duración': 'Duración (días)',
+        'duracion': 'Duración (días)',
+        'Duración (días)': 'Duración (días)'
+    }
+
+    for original, corregido in columnas_flexibles.items():
+        if original in df.columns and corregido not in df.columns:
+            df[corregido] = df[original]
+
     columnas_costo_existente = [col for col in df.columns if col.lower() in ['costo parcial', 'costo real']]
 
-    if all(col in df.columns for col in columnas_requeridas):
-        df["Costo Estimado IA"] = modelo.predict(df[columnas_requeridas])
+    if all(col in df.columns for col in columnas_requeridas_modelo):
+        df["Costo Estimado IA"] = modelo.predict(df[columnas_requeridas_modelo])
         st.markdown("### 🤖 Presupuesto analizado por IA")
         st.dataframe(df)
 
@@ -63,4 +69,4 @@ if archivo is not None:
         st.download_button("📥 Descargar presupuesto con análisis", data=output.getvalue(), file_name="presupuesto_estimado.xlsx", mime="application/vnd.ms-excel")
 
     else:
-        st.error("❗ El archivo debe tener las columnas: 'Cantidad', 'PU (S/.)', y 'Duración'")
+        st.error("❗ El archivo debe tener las columnas: 'Cantidad', 'PU (S/.)', y 'Duración (días)'")
